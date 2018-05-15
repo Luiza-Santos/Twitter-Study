@@ -1,0 +1,67 @@
+---
+date: "May 15, 2018"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Capstone Proposal
+### Derogation of Political Moderates Study
+##### By Luiza Santos
+
+***
+
+#### **The Problem**
+*What is the problem I want to solve?*
+
+The American political system is marked by stark ideological divides. Congress is pulled apart by two very distinct conceptualizations of government and there is a growing tendency towards polarization and partisan animosity. 
+
+In this climate, political parties are constantly competing against each other for group-based victories, which makes the political process feel more akin to war than to cooperative democratic negotiations. 
+
+Since I would like to better understand the underpinnings of political polarization, I want to explore if the derogation of political moderates can play an important role in this process . 
+
+The general idea is that, even though moderates could act as bridges between the ideological divide, they may be seen as disloyal and uncommitted to people at both sides of the political spectrum. 
+
+For more information on the American political polarization:
+<http://www.people-press.org/2014/06/12/political-polarization-in-the-american-public/> 
+
+***
+
+#### **The Client**
+*Who is your client and why do they care about this problem? In other words, what will your client do or decide based on your analysis that they wouldn’t have otherwise?*
+
+Understanding the bases of political polarization could provide practical insights for public policy and conflict resolution strategies.
+The clients, in this case, would be political consultants and policy makers. These results could be used to better understand how group membership in the political realm can shape people's support of specific candidates and their subsequent voting behavior. 
+
+***
+
+#### **The Data**
+*What data are you going to use for this? How will you acquire this data?*
+
+This project has two parts, each part has a distinct dataset. 
+
+* First, I am going to extract tweets from moderate and extreme Democrat and Republican politicians on Twitter. The idea is that extreme politicians may be followed more and retweeted more frequently than moderate politicians. 
+
+* Second, I will analyze the data of a experimental research study I conducted this Spring. The study asked participants to rate a hypothetical person - who held either moderate or extreme views on a particular political issue - on a series of scales, including traits such as goodness and trustworthiness.
+
+#### **The Approach**
+*In brief, outline your approach to solving this problem (knowing that this might
+change later)*
+
+I will:
+
++ Clean the data 
+    + Tweets can have a lot of weird characters and emoticons that will need to be cleaned. 
++ Analyse the data
+    + Use inferential statistics to determine if there is a relationship between variables as well as the strength of that relationship.  
++ Data visualization
+    + Create graphs to communicate any important insights
+
+***
+
+#### **Deliverables**
+*What are your deliverables?*
+
+This capstone project will culminate in a report that will include the R code used to clean and analyze the data as well as a slide deck illustrating any major findings.
