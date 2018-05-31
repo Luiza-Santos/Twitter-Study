@@ -1,0 +1,57 @@
+---
+title: "DW_3.2"
+author: "Luiza Santos"
+date: "May 31, 2018"
+output: pdf_document
+---
+
+## Loading the data
+
+```{r Loading}
+library("tidyverse")
+titanic <- read_csv('titanic_original.csv')
+```
+
+## Port of embarkation
+
+```{r PE}
+titanic <- titanic %>%
+  mutate(embarked = ifelse(embarked == " ", "S", as.character(embarked)))
+```
+
+##Age
+
+```{r Age}
+mean(titanic$age, na.rm=TRUE)
+titanic <- titanic %>%
+  mutate(age = ifelse(is.na(age), "30", as.numeric(age)))
+```
+
+##Lifeboat
+
+```{r Lifeboat}
+titanic <- titanic %>% 
+  mutate(boat = ifelse(is.na(boat) | boat == " ", "None", as.character(boat)))
+```
+
+##Cabin
+
+Many passangers don't have a cabin number associated with their records. It seems like cabin records were much more prevalent among people of higher SES. Since there seems to be a relationship between SES and survival rate, the existence/absence of cabin records could be used to indirectly predict survival outcomes. 
+
+```{r cabin}
+titanic <- titanic %>%
+  mutate(has_cabin_number = ifelse(is.na(cabin), 0, 1))
+```
+
+##Save Clean Dataset
+
+```{r save}
+write_csv(titanic, 'titanic_clean.csv')
+```
+
+
+
+
+
+
+
