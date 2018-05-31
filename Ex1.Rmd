@@ -1,0 +1,76 @@
+---
+title: "Data_Wrangling_Ex1"
+author: "Luiza Santos"
+date: "May 30, 2018"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Data Wrangling Exercise 1
+
+```{r LOADING}
+df <- read.csv('refine_original.csv')
+library(dplyr)
+library(tidyr)
+```
+
+## Clean up brand names
+
+```{r PRE-CLEANING}
+clean_df <- df %>%
+  mutate(company = ifelse(company == "Phillips" | company == "phillips" | company == "philips" | company == "phllips" | company == "phillps" | company == "phillipS" | company == "fillips" | company == "phlips", "Philips",
+                                ifelse(company == "akzo" | company == "AKZO" | company == "akz0" | company == "ak zo" | company == "Akzo", "Akzo",
+                                       ifelse(company == "van Houten" | company == "van houten" | company == "Van Houten", "Van Houten",
+                                              ifelse(company == "unilver" | company == "unilever" | company == "Unilever", "Unilever", NA)))))
+         
+
+```
+
+##Separate product code and number
+
+
+```{r Separate}
+clean_df <- separate(clean_df, Product.code...number, into = c("product_code", "product_number"), sep = "-")
+
+```
+
+##Add product categories
+
+```{r Product category}
+clean_df <- clean_df %>% mutate(product_name = ifelse(product_code == "p", "Smartphone",
+                                          ifelse(product_code == "v", "TV",
+                                                 ifelse(product_code == "x", "Laptop",
+                                                        ifelse(product_code == "q", "Tablet", NA)))))
+
+```
+
+##Geocoding
+
+```{r Concatenate}
+clean_df <- clean_df %>% mutate(full_address = paste(address, city, country, sep = ",") )
+
+```
+
+##Dummy Variables
+```{r}
+clean_df <- clean_df %>% mutate(company_philips = ifelse(company == "Philips", 1, 0)) %>%
+  mutate(company_azko = ifelse(company == "Azko", 1, 0)) %>% 
+  mutate(company_van_houten = ifelse(company == "Van Houten", 1, 0)) %>% 
+  mutate(company_unilever = ifelse(company == "Unilever", 1, 0)) %>% 
+  mutate(product_smartphone = ifelse(product_name == "Smartphone", 1, 0)) %>% 
+  mutate(product_tv = ifelse(product_name == "TV", 1, 0)) %>% 
+  mutate(product_laptop = ifelse(product_name == "Laptop", 1, 0)) %>% 
+  mutate(product_tablet = if_else(product_name == "Tablet", 1, 0)) 
+
+```
+
+
+#Save in CSV
+
+```{r}
+write.csv(clean_df, "refine_clean.csv")
+
+```
