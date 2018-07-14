@@ -1,0 +1,102 @@
+---
+title: "Twitter_project_test"
+author: "Luiza Santos"
+date: "July 13, 2018"
+output: html_document
+---
+
+## Loading
+
+```{r}
+library(rtweet)
+library(syuzhet)
+library(ggplot2)
+library(twitteR)
+library(igraph)
+library(ggraph)
+library(tidyverse)
+library(ROAuth)
+```
+
+## Authorization keys
+
+I have been having some trouble with this step (I receive an error message and can't seem to get an authorization code).
+
+```{r twitter}
+requestURL <- "https://api.twitter.com/oauth/request_token"
+accessURL <- "https://api.twitter.com/oauth/access_token"
+authURL <- "https://api.twitter.com/oauth/authorize"
+consumerKey <- "m6iCVpG57RnEeZJJPIJVYYTxb"
+consumerSecret <- "Q7s7WMRtUB4yS8F0Kbx4MgQaKnGIalZOuDgPQkXM2BJnNA2Aor"
+my_oauth <- OAuthFactory$new(consumerKey=consumerKey, consumerSecret=consumerSecret, 
+                             requestURL=requestURL, accessURL=accessURL, authURL=authURL)
+
+my_oauth$handshake(cainfo = system.file("CurlSSL", "cacert.pem", package = "RCurl"))
+
+```
+
+Interestingly, I found this package in Github that estimates a Twitter user’s political ideology based on the accounts they follow. 
+
+```{r}
+install.packages("devtools")
+library(devtools)
+install_github("pablobarbera/twitter_ideology/pkg/tweetscores")
+library(tweetscores)
+```
+
+Here is more information on the package: https://github.com/pablobarbera/twitter_ideology
+
+Currently, some U.S. politicians with high Twitter following are: Donald Trump, Hillary Clinton, Barack Obama, Arnold Schwarzenegger, Mitt Romney, Paul Ryan, Joe Biden, John McCain, Bernie Sanders (that would give me 5 Republicans and 5 Democrats)
+
+After plotting their ideology, I would like to run a sentiment analysis of their tweets and detect their moral rhetoric according to the dictionary provided by the Moral Foundations Theory. 
+
+MFT posits that, cross-culturally, all moral concerns are rooted in five general content domains: Care/harm (sensitivity to the suffering of others), Fairness/cheating, (reciprocal social interactions and the motivations to be fair and just when working together), Loyalty/betrayal (promoting ingroup cooperation, sacrifice, and trust), Authority/subversion (endorsing social hierarchy), and Purity/degradation (promoting cleanliness of the body and the soul over hedonism). 
+
+The researchers claim that liberals tend to show greater endorsement and use of the Harm/care and Fairness/reciprocity foundations compared to the other 3 foundations, whereas conservatives endorsed and used the 5 foundations more equally.
+
+Paper with moral dictionary: http://www-bcf.usc.edu/~jessegra/papers/GrahamHaidtNosek.2009.Moral%20foundations%20of%20liberals%20and%20conservatives.JPSP.pdf
+
+My idea was to use these politicians tweets to test this claim, while also trying to see if there are any differences between moderate and more extreme politicians. 
+
+I tried to apply this idea to a dataset I found on Kaggle (https://www.kaggle.com/gsdeepakkumar/presidential-candidate-tweets-an-analysis-with-r/notebook) that has past tweets from Hillary Clinton and Donald Trump. 
+
+I used the following code: 
+```{r}
+#Open csv
+
+tweets <- read.csv("tweets.csv")
+
+Hillary <- subset(tweets,handle=="HillaryClinton") 
+
+library(stringi)
+
+#Preprocessing
+
+Hillary_text <- stri_trim(Hillary$text) #Strip surrounding whitespace
+Hillary_text <- stri_trans_tolower(Hillary$text) #transform to lower case
+
+#Tokenization
+
+install.packages("quanteda")
+library(quanteda)
+Hillary_tokens <- tokens(Hillary_text)
+
+#Creating a Document Term Matrix
+Hillary_dfm <- dfm(Hillary_tokens)
+
+#Moral dictionary
+Moral_dict <- dictionary(list(harm = c("safe*", "peace*", "compassion*", "empath*", "sympath*", "care", "caring", "protect*", "shield", "shelter", "amity", "secur*", "benefit*", "defen*", "guard*", "preserve", "harm","suffer*", "war", "wars", "warl*", "warring", "fight","violen*", "hurt*", "kill", "kills", "killer*", "killed", "killing", "endanger*", "cruel*", "brutal*", "abuse*", "damag*", "ruin*", "ravage", "detriment*", "crush*", "attack*", "annihilate*", "destroy", "stomp", "abandon*", "spurn", "impair", "exploit", "exploits", "exploited", "exploiting", "wound"),
+                              fairness = c("fair", "fairly", "fairness", "fair*", "fairmind*", "fairplay", "equal*", "justice", "justness", "justifi*", "reciproc*", "impartial*", "egalitar*", "rights", "equity","evenness", "equivalent", "unbias*", "tolerant", "equable", "balance*", "homologous", "unprejudice*","reasonable", "constant", "honest*", "unfair*","unequal*", "bias*", "unjust*", "injust*", "bigot", "discriminat*", "disproportion*","inequitable", "prejud*", "dishonest", "unscrupulous", "dissociate", "preference", "favoritism", "segregat*", "exclusion", "exclud*")))
+
+dict_hillary <- dfm_lookup(Hillary_dfm, Moral_dict, nomatch = "_unmatched")
+tail(dict_hillary)
+
+
+```
+
+I ended up with a dfm that listed all the number of words used per tweet and detected the moral words related to harm and fairness (I will add the other moral foundations when I have more time). 
+
+Now, I would like to add the count of all "harm" words and all "fairness" words to see if I could compare them to the number used by Donald Trump, but I don't know how to do that with a dfm. 
+
+The website I used for reference on quanteda: http://kenbenoit.net/pdfs/text_analysis_in_R.pdf
+
